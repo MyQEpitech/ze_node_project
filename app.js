@@ -3,6 +3,7 @@ const app = express();
 const prisma = require('@prisma/client').PrismaClient;
 const {body, validationResult} = require('express-validator');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken')
 
 const prismaClient = new prisma()
 app.use(express.json());
@@ -57,8 +58,15 @@ app.post('/register',  [
                 password: hashedPassword
             }
         });
-        
-        res.status(201).json({message: 'User created successfully', user});
+
+        let token = jwt.sign(user, process.env.JWT_SECRET_KEY, {expiresIn: 60 * 60 * 24});
+        res.status(201).json({
+            message: 'User created successfully', 
+            data:{
+                username: user.username,
+                email: user.email,
+                token: token
+        }});
     } catch (error) {
         console.log(error);
         
