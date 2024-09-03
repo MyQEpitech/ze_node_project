@@ -1,4 +1,4 @@
-const {body, validationResult} = require('express-validator');
+const {body} = require('express-validator');
 const { PrismaClient } = require('@prisma/client')
 
 const dbClient = new PrismaClient()
@@ -34,6 +34,5 @@ const registerformRules = [
     ]
 
 module.exports = {
-    validationResult,
     registerformRules
 };

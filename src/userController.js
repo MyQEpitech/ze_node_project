@@ -1,14 +1,15 @@
-const express = require('express');
-const { createUser } = require('./userModel');
-const { registerformRules, validationResult } = require('./validationConfig')
+const { validationResult } = require('express-validator')
 const bcrypt = require('bcryptjs')
+const { PrismaClient } = require('@prisma/client')
 const jwt = require('jsonwebtoken')
 
-const router = express.Router();
+
+const dbClient = new PrismaClient();
+
 
 /********** User registration **********/
 
-router.post('/register', registerformRules, async(req, res) => {
+const register = async (req, res) => {
     const errors = validationResult(req);
     if(!errors.isEmpty())
         return res.status(400).json({errors: errors.array()});
@@ -16,9 +17,11 @@ router.post('/register', registerformRules, async(req, res) => {
     let {email, username, password, firstName, lastName} = req.body;
 
     try {
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10); 
         password = hashedPassword;
-        const user = await createUser({email, username, password, firstName, lastName});
+        const user = await dbClient.user.create({
+            data: {email, username, password, firstName, lastName}
+        });
         
         let token = jwt.sign(user, process.env.JWT_SECRET_KEY, {expiresIn: 60 * 60 *24});
         res.status(201).json({
@@ -35,7 +38,7 @@ router.post('/register', registerformRules, async(req, res) => {
 
         res.status(500).json({error: 'Server error'});
     }
-});
+}
 
 
-module.exports = router;
+module.exports = { register };

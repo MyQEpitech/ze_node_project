@@ -1,11 +1,11 @@
 const express = require('express');
-const userController = require('./userController');
+const authRouter = require('./routes');
 
 const app = express();
 
 app.use(express.json());
 
-app.use('/auth', userController)
+app.use('/auth', authRouter)
 
 const PORT = process.env.PORT || 3000;
 

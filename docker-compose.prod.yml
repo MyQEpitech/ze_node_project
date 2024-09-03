@@ -1,0 +1,30 @@
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    ports:
+      - "3001:3000"
+    networks:
+      - ze_node-network
+
+  db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD:  ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    ports:
+      - "3307:3306"
+    networks:
+      - ze_node-network
+
+networks:
+    ze_node-network:
+        driver: bridge
